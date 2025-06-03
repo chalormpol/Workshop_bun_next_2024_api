@@ -34,4 +34,39 @@ export const UserController = {
       return { message: error };
     }
   },
+  update: async ({
+    body,
+    request,
+    jwt,
+  }: {
+    body: {
+      username: string;
+      password: string;
+    };
+    request: any;
+    jwt: any;
+  }) => {
+    try {
+      const headers = request.headers.get("Authorization");
+      const token = headers?.split(" ")[1];
+      const payload = await jwt.verify(token);
+      const id = payload.id;
+      const oldUser = await prisma.user.findUnique({
+        where: { id },
+      });
+      const newData = {
+        username: body.username,
+        password: body.password ?? oldUser?.password,
+      };
+
+      await prisma.user.update({
+        where: { id },
+        data: newData,
+      });
+
+      return { message: "success" };
+    } catch (error) {
+      return { message: error };
+    }
+  },
 };
