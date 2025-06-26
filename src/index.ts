@@ -3,6 +3,35 @@ import { jwt } from "@elysiajs/jwt";
 import { cors } from "@elysiajs/cors";
 import { UserController } from "./controllers/UserController";
 import { DeviceController } from "./controllers/DeviceController";
+import { SectionController } from "./controllers/SectionController";
+import { DepartmentController } from "./controllers/DepartmentController";
+import { RepairRecordController } from "./controllers/RepairRecordController";
+import { CompanyController } from "./controllers/CompanyController";
+
+// middleware for check token
+const checkSignIn = async ({
+  jwt,
+  request,
+  set,
+}: {
+  jwt: any;
+  request: any;
+  set: any;
+}) => {
+  const token = request.headers.get("Authorization")?.split(" ")[1];
+
+  if (!token) {
+    set.status = 401;
+    return { message: "Unauthorized" };
+  }
+
+  const payload = await jwt.verify(token, "secret");
+
+  if (!payload) {
+    set.status = 401;
+    return { message: "Unauthorized" };
+  }
+};
 
 const app = new Elysia()
   .use(
@@ -20,6 +49,39 @@ const app = new Elysia()
   .post("/api/user/create", UserController.create)
   .put("/api/user/updateUser/:id", UserController.updateUser)
   .delete("/api/user/remove/:id", UserController.remove)
+  .get("/api/user/listEngineer", UserController.listEngineer)
+
+  //
+  // Company
+  //
+  .get("/api/company/info", CompanyController.info, {
+    beforeHandle: checkSignIn,
+  })
+  .put("/api/company/update", CompanyController.update)
+
+  //
+  // Repair Record
+  //
+  .get("/api/repair-record/list", RepairRecordController.list)
+  .post("/api/repair-record/create", RepairRecordController.create)
+  .put("/api/repair-record/update/:id", RepairRecordController.update)
+  .delete("/api/repair-record/remove/:id", RepairRecordController.remove)
+  .put(
+    "/api/repair-record/updateStatus/:id",
+    RepairRecordController.updateStatus
+  )
+  .put("/api/repair-record/receive", RepairRecordController.receive)
+  .get("/api/income/report/:startDate/:endDate", RepairRecordController.report) // รายรับรวมตามวันที่
+  .get("/api/repair-record/dashboard", RepairRecordController.dashboard) // รายรับรวมตามวันที่
+
+  //
+  // Department and Section
+  //
+  .get("/api/department/list", DepartmentController.list)
+  .get(
+    "/api/section/listByDepartment/:departmentId",
+    SectionController.listByDepartment
+  )
 
   //
   // Device

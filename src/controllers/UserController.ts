@@ -1,6 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { Param } from "@prisma/client/runtime/library";
-import { password } from "bun";
 const prisma = new PrismaClient();
 
 export const UserController = {
@@ -77,6 +75,18 @@ export const UserController = {
           id: true,
           username: true,
           level: true,
+          Section: {
+            select: {
+              name: true,
+              id: true,
+              department: {
+                select: {
+                  name: true,
+                  id: true,
+                },
+              },
+            },
+          },
         },
         where: {
           status: "active",
@@ -97,6 +107,8 @@ export const UserController = {
     body: {
       username: string;
       password: string;
+      level: string;
+      sectionId: number;
     };
   }) => {
     try {
@@ -117,6 +129,7 @@ export const UserController = {
       username: string;
       password: string;
       level: string;
+      sectionId: number;
     };
     params: {
       id: string;
@@ -135,6 +148,7 @@ export const UserController = {
         username: body.username,
         password: newPassword,
         level: body.level,
+        sectionId: body.sectionId,
       };
 
       await prisma.user.update({
@@ -165,6 +179,22 @@ export const UserController = {
       });
 
       return { message: "success" };
+    } catch (error) {
+      return { message: error };
+    }
+  },
+  listEngineer: async () => {
+    try {
+      const engineers = await prisma.user.findMany({
+        where: {
+          level: "engineer",
+          status: "active",
+        },
+        orderBy: {
+          username: "asc",
+        },
+      });
+      return { engineers: engineers };
     } catch (error) {
       return { message: error };
     }
