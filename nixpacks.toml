@@ -2,7 +2,10 @@
 nixPkgs = ["bun", "openssl"]
 
 [phases.build]
-cmds = ["bun install"]
+cmds = [
+  "bun install",
+  "bunx prisma generate"
+]
 
 [phases.start]
-cmd = "bun start"
+cmd = "bun src/index.ts"
