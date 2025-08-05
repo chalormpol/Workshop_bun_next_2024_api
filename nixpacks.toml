@@ -1,4 +1,4 @@
-[phases.setup]
+[phases.setup] 
 nixPkgs = ["bun", "openssl"]
 
 [phases.build]
@@ -8,4 +8,4 @@ cmds = [
 ]
 
 [phases.start]
-cmd = "LD_LIBRARY_PATH=/nix/var/nix/profiles/default/lib bun src/index.ts"
+cmd = "bun src/index.ts"
