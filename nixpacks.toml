@@ -1,6 +1,5 @@
 [phases.setup]
-nixPkgs = ["bun", "openssl_3_0"]
-
+nixPkgs = ["bun", "openssl_3"]
 
 [phases.build]
 cmds = [
@@ -10,3 +9,6 @@ cmds = [
 
 [phases.start]
 cmd = "bun src/index.ts"
+env = { LD_LIBRARY_PATH = "/nix/store/khsdfxm8dz7qf7r35x235jl7v5pi87gn-openssl-3.0.16/lib" }
+
+
