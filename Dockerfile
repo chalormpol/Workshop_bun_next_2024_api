@@ -2,13 +2,12 @@ FROM oven/bun:1.1.18-slim
 
 WORKDIR /app
 
-# คัดลอกไฟล์ทั้งหมดก่อน (รวม schema.prisma)
-COPY app ./
+COPY package.json bun.lock ./
 
-# ติดตั้ง dependencies
 RUN bun install --frozen-lockfile
 
-# รัน prisma generate (อีกครั้ง เพื่อชัวร์)
+COPY . .
+
 RUN bunx prisma generate
 
 EXPOSE 3000

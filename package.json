@@ -4,7 +4,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "postinstall": "bunx prisma generate",
     "start": "bun src/index.ts"
   },
   "dependencies": {
