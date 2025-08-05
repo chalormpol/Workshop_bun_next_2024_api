@@ -24,8 +24,17 @@ export const DeviceController = {
       return error;
     }
   },
-  list: async () => {
+  list: async ({ query }: { query: { page: number; pageSize: number } }) => {
     try {
+      const page = parseInt(query.page.toString());
+      const pageSize = parseInt(query.pageSize.toString());
+      const totalRows = await prisma.device.count({
+        where: {
+          status: "active",
+        },
+      });
+
+      const totalPages = Math.ceil(totalRows / pageSize);
       const devices = await prisma.device.findMany({
         where: {
           status: "active",
@@ -33,9 +42,11 @@ export const DeviceController = {
         orderBy: {
           id: "desc",
         },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
       });
 
-      return { message: "success", devices };
+      return { message: "success", results: devices, totalPages: totalPages };
     } catch (error) {
       return error;
     }

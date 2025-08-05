@@ -27,7 +27,15 @@ export const UserController = {
         return { message: "Invalid username or password" };
       }
 
-      const token = await jwt.sign(user);
+      const now = Math.floor(Date.now() / 1000); // current time in seconds
+      const exp = now + 3600; // 1 hour from now
+
+      const token = await jwt.sign({
+        ...user,
+        exp, // ⬅️ ฝัง exp เข้าไปใน payload ด้วย
+      });
+
+      console.log(token);
       return { token: token, user: user };
     } catch (error) {
       return { message: error };
@@ -195,6 +203,24 @@ export const UserController = {
         },
       });
       return { engineers: engineers };
+    } catch (error) {
+      return { message: error };
+    }
+  },
+  level: async ({ jwt, request }: { jwt: any; request: any }) => {
+    try {
+      const headers = request.headers.get("Authorization");
+      const token = headers?.split(" ")[1];
+      const payload = await jwt.verify(token);
+      const id = payload.id;
+      const user = await prisma.user.findUnique({
+        where: { id },
+        select: {
+          level: true,
+        },
+      });
+
+      return user?.level;
     } catch (error) {
       return { message: error };
     }
